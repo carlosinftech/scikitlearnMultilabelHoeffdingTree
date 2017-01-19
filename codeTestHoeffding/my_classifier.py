@@ -9,9 +9,21 @@ class HoeffdingTreeClassifier:
 	def __init__(self):
 		self.j_max = 0
 		self.L = -1
-		self.H = []
+		self.parent = None
+		self.children = None
+		self.xdata = None
+		self.ydata = None
 
+	def setParent(self,node):
+		self.parent = node
+	
+	def compute_hoeffding_bound(self, max_value, confidence, weight):
+		return math.sqrt(((max_value * max_value) * math.log(1.0 / confidence)) / (2.0 * weight))
+	##Just starting an empty tree and adding the x to it. 	
 	def fit(self, X, Y):
+	    if !self.data:
+			self.data = X
+		
 		self.ws,self.L = Y.shape
 		h = PS(p=7,h=DecisionTreeClassifier())
 		h.fit(X,Y)
