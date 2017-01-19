@@ -4,26 +4,45 @@ from molearn.classifiers.PS import PS
 
 from sklearn.tree import DecisionTreeClassifier
 
+from infogainsplitmetric import InfoGainSplitMetric
+
+from node import Node
+
+
+
 class HoeffdingTreeClassifier:
 
 	def __init__(self):
 		self.j_max = 0
 		self.L = -1
-		self.parent = None
-		self.children = None
+		self.root = None
 		self.xdata = None
 		self.ydata = None
+		self.h = None
+		self.H = []
+		##Infogain stuff
+		self._min_frac_weight_for_two_branches_gain = 0.01
+		self.INFO_GAIN_SPLIT = 1
+		self._selected_split_metric = self.INFO_GAIN_SPLIT
+		self._split_confidence = 0.0000001
+		self._split_metric = InfoGainSplitMetric(self._min_frac_weight_for_two_branches_gain)
+
 
 	def setParent(self,node):
 		self.parent = node
 	
 	def compute_hoeffding_bound(self, max_value, confidence, weight):
 		return math.sqrt(((max_value * max_value) * math.log(1.0 / confidence)) / (2.0 * weight))
+	
 	##Just starting an empty tree and adding the x to it. 	
 	def fit(self, X, Y):
-	    if !self.data:
-			self.data = X
-		
+		if not self.xdata:
+			self.xdata = X
+		##print(len(X[0]))
+		##print(len(X))
+		metric_max = self._split_metric.get_metric_range(X)
+		##print(metric_max)
+		##hoeffding_bound = self.compute_hoeffding_bound(metric_max, self._split_confidence, node.total_weight())
 		self.ws,self.L = Y.shape
 		h = PS(p=7,h=DecisionTreeClassifier())
 		h.fit(X,Y)
@@ -36,6 +55,13 @@ class HoeffdingTreeClassifier:
 		return self
 
 	def partial_fit(self, x, y=None):
+		metric_max = self._split_metric.get_metric_range(x)
+		##print('p')
+		##print(metric_max)
+		##print(x[0])
+		##print((x[0]))
+		##print(len(x))
+		##print(len(x[0]))
 		xb = False
 		xpos = self.xpos
 		self.X_batch[xpos]=x
