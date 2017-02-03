@@ -7,6 +7,11 @@ class Node():
 	
 	def setParent(self,node):
 		self.parent = node
+		
+	def get_node_statistics(self):
+		return self.statistics
+	
+	
 	##it only receives one row
 	def update_statistics(self,att,classes):
 		if self.map is None:
@@ -23,4 +28,5 @@ class Node():
 						self.map['class'+str(i)]['attribute'+str(j)]={str(value):1}
 					else:
 						self.map['class'+str(i)]['attribute'+str(j)][str(value)]+=1
-		print(self.map)
+		##print(self.map)
+
