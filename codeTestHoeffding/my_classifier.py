@@ -22,7 +22,9 @@ class HoeffdingTreeClassifier:
 		self._selected_split_metric = self.INFO_GAIN_SPLIT
 		self._split_confidence = 0.0000001
 		self._split_metric = InfoGainSplitMetric(self._min_frac_weight_for_two_branches_gain)
-		
+		self.current  = None
+		self.first = 0
+		self.second = 0
 
 
 	
@@ -35,12 +37,38 @@ class HoeffdingTreeClassifier:
 		Y_sum = sum(Y,axis=0)
 		self.j_max = argmax(Y_sum)
 		return self
-
+	def split_verification(self):
+	
+		return None
+	##
+	def compute_first_second_best(self, x):
+		height, width = x.shape
+		for i in range (0,width) :
+			metric_max = self._split_metric.get_metric_range(x)
+			if metric_max > self.first:
+				self.second = self.first
+				self.first = metric_max
+				
+	
 	def partial_fit(self, x, y=None):
-		if self.root is None:
+		if self.root is None:  
 			self.root = Node()
-		metric_max = self._split_metric.get_metric_range(x)
-		self.root.update_statistics(x,y)
+			self.current = self.root
+			self.root.update_statistics(x,y)
+		
+		self.compute_first_second_best(x)	
+		g_Xa = self.first
+		g_Xb = self.second
+		ns = self.current.get_node_statistics()
+		print(g_Xa)
+		print(g_Xb)
+		##compute_hoeffding_bound(max_value,confidence, weight) ## Compute Hf bound
+		
+		
+		
+		##boolean split = split_verification(ns)
+			##if split:
+			## 
 		return self
 
 	def predict(self, X):
@@ -69,5 +97,6 @@ class MajorityLabel:
 		Y = zeros((N,self.L))
 		Y[:,self.j_max] = 1
 		return Y
+
 
 
