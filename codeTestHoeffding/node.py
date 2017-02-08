@@ -1,3 +1,4 @@
+from numpy import *
 from infogainsplitmetric import InfoGainSplitMetric
 
 class Node():
@@ -16,6 +17,10 @@ class Node():
 		self.column_name_second  = None
 		self.column_name_first = None 
 		self.tie_breaking = 0.05
+		self.confidence = 0.95
+		self.delta = 1-self.confidence
+		self.n = 0
+		self.number_of_classes = 0
 	
 	def setParent(self,node):
 		self.parent = node
@@ -57,18 +62,27 @@ class Node():
 					self.first = metric_max
 					self.column_name_second = self.column_name_first
 					self.column_name_first = key_class
-		print("first",self.column_name_first)
-		print("second",self.column_name_second)
+					self.n = len(column)
+			##print("y",key_attribute,"first",self.column_name_first)
+			##print("y",key_attribute,"second",self.column_name_second)
 	
-	def compute_hoeffding_bound(self, max_value, confidence, weight):
-		return math.sqrt(((max_value * max_value) * math.log(1.0 / confidence)) / (2.0 * weight))
+	##range of a variable 
+	##(e.g., for a probability the range is one, and for an information gain the range is log c, where c is the number of classes
+	def compute_hoeffding_bound(self, range, delta, n):
+		return math.sqrt(((range * range) * math.log(1.0 / delta)) / (2.0 * n))
+	
+
 	
 	def comparison_entropies_hf_bound(self):
-		compute_hoeffding_bound(max_value,confidence, weight)
+	##number of rows of r
+		##just for info gain
+		c = math.log(self.number_of_classes)
+		hoeffding_bound = self.compute_hoeffding_bound(c,self.delta, self.n)
 		entropy_Xa_Xb = self.first - self.second
-		if (entropy_Xa_Xb > compute_hoeffding_bound) | (compute_hoeffding_bound < tie_breaking): ##tie_breaking recommended in MO
-			##HACER SPLIT
-			a = 0
+		if (entropy_Xa_Xb > hoeffding_bound): ##tie_breaking recommended in MO
+			print('split')
+		else:
+			print('dont split')
 		
 		
 	
@@ -79,6 +93,7 @@ class Node():
 	##attribute is represented by j
 	##value of attribute is represented by the ones and increased every time
 	def update_statistics(self,x,y):
+		self.number_of_classes = len(x[0])-1
 		if self.map is None:
 			self.map = {}
 		for i in range(len(y)):
@@ -94,4 +109,5 @@ class Node():
 					else:
 						self.map[str(i)][str(j)][str(value)]+=1
 		self.compute_first_second_best()
+		self.comparison_entropies_hf_bound()
 		
