@@ -3,6 +3,8 @@ from numpy import *
 
 ##  Application specific imports
 from infogainsplitmetric import InfoGainSplitMetric
+from sklearn.naive_bayes import GaussianNB
+import numpy as np
 
 """This class creates the nodes that constucts a Hoeffding tree"""
 
@@ -44,8 +46,7 @@ class Node():
 		   saved in an array. Then is computed the method entropy (information gain in this case) om order 
 		   to obtain the attribute with highest entropy and the second highest.
 		   self.first is the attribute with highest entropy.
-		   self.second is the attribute with the second highest entropy.
-		"""
+		   self.second is the attribute with the second highest entropy."""
 		metric_temp = 0
 		metric_max = 0
 		self.first = 0
@@ -75,8 +76,7 @@ class Node():
 		   then it does the substaction of the values of self.first and self.second
 		   and lastly it compares if the substraction of the entopies is greater than the hoeffding
 		   bound. if so then the node must split.
-		   Note: for the range of the variable, for information gain the range is log c, where c is the number of classes
-		"""
+		   Note: for the range of the variable, for information gain the range is log c, where c is the number of classes."""
 		c = math.log(self.number_of_classes)
 		hoeffding_bound = self.compute_hoeffding_bound(c,self.delta, self.n)
 		entropy_Xa_Xb = self.first - self.second
@@ -88,8 +88,7 @@ class Node():
 		
 	def split(self,column_name):
 		"""Process of spliting a node, for each y in the map it is created a node classified as child.
-		   each child  is loaded with its belonging statistics.
-		"""
+		   each child  is loaded with its belonging statistics."""
 		self.splitCondition = column_name
 		self.children = {}
 		self.activeNode = False
@@ -118,12 +117,21 @@ class Node():
 		"""For adding a map and statistics"""
 		self.map = None
 		self.statistics = None
+
+	def predict(self, x): ##TO DO in Scikit learn
+		N = x.shape
+		L = len(x[0])-1
+		#Y_prev = zeros((N,L) 
+		gnb = GaussianNB()	
+		if self.activeNode:
+			for i in range(0,L):
+				Y = self.gnb.predict(np.asmatrix(x[i, :]))
+			return Y
 	
 	def update_statistics(self,x,y):
 		"""This method fits the x and y, if the node is active then the statistics are updating according the values of x an y
 		   It is also invoqued the methods for obtaing the first and second best 
-		   if is not an active node, it goes to the child leaves and recursively is called again the method.
-		"""
+		   if is not an active node, it goes to the child leaves and recursively is called again the method."""
 		self.number_of_classes = len(x[0])-1
 		if self.activeNode:
 			if self.statistics is None:
