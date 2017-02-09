@@ -27,7 +27,7 @@ class EnsembleClassifier(BaseEnsemble):
         #find the most frequent predict
         most_predicted = Counter(np.array(predict).flatten())
         label = most_predicted.most_common(1)[0][0]
-        print label
+        print X, label
         return label
 
 
@@ -40,7 +40,7 @@ class EnsembleClassifier(BaseEnsemble):
             # @nhatminh: for each classifier, draw a Poisson distribution of size(n_classifier)
             for i in range(0, self.n_classifier):
                 n_poisson = np.random.poisson(1)
-                print "Poisson: ", n_poisson
+                # print "Poisson: ", n_poisson
                 for j in range(0, n_poisson):
                     self.instances_bag_X[i].append(x)
                     self.instances_bag_Y[i].append(Y)
@@ -50,31 +50,26 @@ class EnsembleClassifier(BaseEnsemble):
 
         else:
             # training models
-            # pass
-            ####
-
-            print "Full of batch, now we TRAIN!"
+            # print "Full of batch, now we TRAIN!"
             self.models = []
             for i in range(0, self.n_classifier):
                 # this line will be changed to use HoeffdingTree
                model = tree.DecisionTreeClassifier()
             #    model = self.baseEns
-               print len(self.instances_bag_X[i]), len(self.instances_bag_Y[i])
+            #    print len(self.instances_bag_X[i]), len(self.instances_bag_Y[i])
                if (len(self.instances_bag_X[i]) ==0):
                    break
                self.models.append(model.fit(np.array(self.instances_bag_X[i]).reshape(-1,1), np.array(self.instances_bag_Y[i]).reshape(-1,1)))
-               print "Classifier[",i,"]: ",self.instances_bag_X[i], self.instances_bag_Y[i]
-               print "Training..."
+            #    print "Classifier[",i,"]: ",self.instances_bag_X[i], self.instances_bag_Y[i]
+            #    print "Training..."
                self.instances_bag_X[i] = []
                self.instances_bag_Y[i] = []
-            # for each instances in model bag train un model
-            # return le bon
-            # vider le model bag
-            # print(self.instances_bag_X)
-                #after training, erase the array of X and Y
+            #after training, empty the array of X and Y
             self.current_instance_number = 0
         return self
 
+
+#Test
 x = EnsembleClassifier(n_classifier=5, buffer_size=6)
 x.fit(0,1)
 x.fit(1,0)
