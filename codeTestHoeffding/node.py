@@ -112,7 +112,8 @@ class Node():
 							if k not in child_map[y_val]:
 								child_map[y_val] = {k:self.map[y_val][k].copy()}
 				self.children[j_val].set_statistics(child_map.copy(),child_statistics.copy())
-	
+		self.map = None
+		self.statistics = None
 	##temporary Need to add the real map and statistics
 	def set_statistics(self,map,statistics):
 		"""For adding a map and statistics"""
@@ -147,7 +148,19 @@ class Node():
 						
 			y_train = y_train
 			x_train = zeros((len(y_train[0]),len(x[0])))
-			Y = zeros((N,self.length_y))
+			
+			for y_value in self.map:
+				x_train_column = 0
+				for j in self.map[y_value]:
+					for j_value in self.map[y_value][j]:
+						x_train_row = 0
+						repetitions = self.map[y_value][j][j_value]
+						for k in range (repetitions):
+							if x_train_row< len(x_train) and x_train_column < len(x_train[0]):
+								x_train[x_train_row][x_train_column] = j_value 
+							x_train_row += 1
+				x_train_column += 1		
+			
 			clf.fit(x_train,y_train[0])
 			Y = clf.predict(x)
 			return Y
