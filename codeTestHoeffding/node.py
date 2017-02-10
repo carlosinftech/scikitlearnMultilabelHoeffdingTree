@@ -93,25 +93,25 @@ class Node():
 		self.activeNode = False
 		previous = 0	
 		for y_val in self.map:
-				for j_val in self.map[y_val][column_name]:
-					child = Node()
-					self.children[j_val]=child
-					child_map = {y_val:{}}
-					child_statistics = {y_val:{}}
-					for element in self.statistics[y_val][column_name][j_val]:			
-						for k in self.map[y_val]:
-							if k != self.column_name_first:
-								for k_val  in  self.statistics[y_val][k]: ##add one
-									if element in self.statistics[y_val][k][k_val]:
-										if k not in child_statistics[y_val]:
-											child_statistics[y_val] = {k:{}}
-										if k_val not in child_statistics[y_val][k]:
-											child_statistics[y_val][k]={k_val:1}
-										else:
-											child_statistics[y_val][k][k_val]+=1
-								if k not in child_map[y_val]:
-									child_map[y_val] = {k:self.map[y_val][k].copy()}
-					self.children[j_val].set_statistics(child_map.copy(),child_statistics.copy())
+			for j_val in self.map[y_val][column_name]:
+				child = Node()
+				self.children[j_val]=child
+				child_map = {y_val:{}}
+				child_statistics = {y_val:{}}
+				for element in self.statistics[y_val][column_name][j_val]:			
+					for k in self.map[y_val]:
+						if k != self.column_name_first:
+							for k_val  in  self.statistics[y_val][k]: ##add one
+								if element in self.statistics[y_val][k][k_val]:
+									if k not in child_statistics[y_val]:
+										child_statistics[y_val] = {k:{}}
+									if k_val not in child_statistics[y_val][k]:
+										child_statistics[y_val][k]={k_val:1}
+									else:
+										child_statistics[y_val][k][k_val]+=1
+							if k not in child_map[y_val]:
+								child_map[y_val] = {k:self.map[y_val][k].copy()}
+				self.children[j_val].set_statistics(child_map.copy(),child_statistics.copy())
 	
 	##temporary Need to add the real map and statistics
 	def set_statistics(self,map,statistics):
@@ -126,19 +126,43 @@ class Node():
 		if self.activeNode:
 			self.n += 1
 			clf = GaussianNB()
+			x_train = None
+			y_train = None
+			y_train_dict = {}
+			count_total = 0
+			for y_value in self.map:
+				for j in self.map[y_value]:
+					count = 0
+					for j_value in self.map[y_value][j]:
+						count += self.map[y_value][j][j_value]
+				count_total += count
+				y_train_dict[y_value] = np.full((1,count),y_value)
+				y_train = zeros((1,count_total))
+			counter = 0
+			for y_value in y_train_dict:
+				for y_dict_value in y_train_dict[y_value]:
+					for i in range (len(y_dict_value)):
+						y_train[0][counter]=y_dict_value[i]
+						counter +=1
+						
+			y_train = y_train
+			x_train = zeros((len(y_train[0]),len(x[0])))
 			Y = zeros((N,self.length_y))
-			clf.fit(x,Y)
+			clf.fit(x_train,y_train[0])
 			Y = clf.predict(x)
-			##for i in range(0,L):
-				##Y = gnb.predict(np.asmatrix(x[i, :]))
-			
-			print(Y)
-			print(self.n)
 			return Y
 		else:
 			try:
 				to_transfer = x[0][int(self.splitCondition)]
-				Y= self.children[str(to_transfer)].predict(x)
+				e = (zeros(len(x[0]-1)))
+				for i in x[0]:
+					j=0
+					if i != int(self.splitCondition):
+						e[j]=x[0][i]
+						j+=1
+				e=[e]
+				
+				Y= self.children[str(to_transfer)].predict(e)
 				return Y
 			except KeyError:
 				print('value '+to_transfer+' for '+self.splitCondition+' not in the tree')	
@@ -156,32 +180,33 @@ class Node():
 			if self.map is None:
 				self.map = {}
 			for i in range(len(y)):
-				if str(i) not in self.map:
-						self.map[str(i)] = {}
-				if str(i) not in self.statistics:
-						self.statistics[str(i)] = {}
+				y_val = str(y[0][i])
+				if y_val not in self.map:
+						self.map[y_val] = {}
+				if y_val not in self.statistics:
+						self.statistics[y_val] = {}
 				for j in range(len(x[0])-1):
 					value = x[0][j]
 							
-					if str(j) not in self.statistics[str(i)]:
+					if str(j) not in self.statistics[y_val]:
 						l = []
 						l.append(self.n)
-						self.statistics[str(i)][str(j)]={str(value):l}
+						self.statistics[y_val][str(j)]={str(value):l}
 					else:
-						if str(value) not in self.statistics[str(i)][str(j)]:
+						if str(value) not in self.statistics[y_val][str(j)]:
 							l = []
 							l.append(self.n)
-							self.statistics[str(i)][str(j)]={str(value):l}
+							self.statistics[y_val][str(j)]={str(value):l}
 						else:
-							self.statistics[str(i)][str(j)][str(value)].append(self.n)
+							self.statistics[y_val][str(j)][str(value)].append(self.n)
 							
-					if str(j) not in self.map[str(i)]:
-						self.map[str(i)][str(j)]={str(value):1}
+					if str(j) not in self.map[y_val]:
+						self.map[y_val][str(j)]={str(value):1}
 					else:
-						if str(value) not in self.map[str(i)][str(j)]:
-							self.map[str(i)][str(j)]={str(value):1}
+						if str(value) not in self.map[y_val][str(j)]:
+							self.map[y_val][str(j)]={str(value):1}
 						else:
-							self.map[str(i)][str(j)][str(value)]+=1
+							self.map[y_val][str(j)][str(value)]+=1
 					
 			self.compute_first_second_best()
 			self.comparison_entropies_hf_bound()
