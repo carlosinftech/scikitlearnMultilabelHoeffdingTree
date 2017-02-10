@@ -3,7 +3,8 @@ ENSEMBLE METHOD
 ==================
 
 **class Bagging()**
-This class is to create a an ensemble method based on bagging for streaming data
+This class is to create a an ensemble method based on bagging for streaming data.
+
 This implementation is based on Oza and Russell's Online Bagging Models.
 
 **Parameters:**
