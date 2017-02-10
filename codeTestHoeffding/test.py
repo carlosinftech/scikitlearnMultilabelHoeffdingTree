@@ -15,11 +15,11 @@ Y = data[:,0:L]
 X = data[:,L:]
 
 print("Experimentation")
-from my_classifier import  HoeffdingTreeClassifier
+from my_classifier import  MultiLabelCCHoeffdingTreeClassifier
 from molearn.classifiers.BR import BR
 from sklearn import linear_model
 
-h = [BR(h=linear_model.SGDClassifier(n_iter=1)), HoeffdingTreeClassifier()]
+h = [BR(h=linear_model.SGDClassifier(n_iter=1)), MultiLabelCCHoeffdingTreeClassifier()]
 
 from molearn.core.evaluation import prequential_evaluation, get_errors
 
