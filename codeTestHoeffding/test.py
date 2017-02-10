@@ -4,9 +4,9 @@ random.seed(0)
 print('Load data')
 import pandas as pd
 
-df = pd.read_csv("data/ohsumed.csv")#s
+df = pd.read_csv("data/ohsumed.csv",nrows=1000)#s
 L = 1
-N_train = 1000
+N_train = 950
 
 labels = df.columns.values.tolist()[0:L]
 data = df.values
