@@ -5,7 +5,7 @@ print('Load data')
 import pandas as pd
 
 df = pd.read_csv("data/ohsumed.csv")#s
-L = 23
+L = 1
 N_train = 1000
 
 labels = df.columns.values.tolist()[0:L]
@@ -15,11 +15,11 @@ Y = data[:,0:L]
 X = data[:,L:]
 
 print("Experimentation")
-from my_classifier import MajorityLabel, HoeffdingTreeClassifier
+from my_classifier import  HoeffdingTreeClassifier
 from molearn.classifiers.BR import BR
 from sklearn import linear_model
 
-h = [MajorityLabel(), BR(h=linear_model.SGDClassifier(n_iter=1)), HoeffdingTreeClassifier()]
+h = [BR(h=linear_model.SGDClassifier(n_iter=1)), HoeffdingTreeClassifier()]
 
 from molearn.core.evaluation import prequential_evaluation, get_errors
 
