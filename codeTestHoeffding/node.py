@@ -28,6 +28,7 @@ class Node():
 		self.confidence = 0.95
 		self.delta = 1-self.confidence
 		self.n = 0
+		self.length_y = 0
 		self.number_of_classes = 0
 		self.splitCondition = None
 		self.activeNode = True
@@ -80,11 +81,9 @@ class Node():
 		c = math.log(self.number_of_classes)
 		hoeffding_bound = self.compute_hoeffding_bound(c,self.delta, self.n)
 		entropy_Xa_Xb = self.first - self.second
-		if (entropy_Xa_Xb > hoeffding_bound): ##tie_breaking recommended in MO
-			print('split')
+		if (entropy_Xa_Xb > hoeffding_bound): 
 			self.split(self.column_name_first)
-		##else:
-			##print('dont split')
+
 		
 	def split(self,column_name):
 		"""Process of spliting a node, for each y in the map it is created a node classified as child.
@@ -97,7 +96,7 @@ class Node():
 				for j_val in self.map[y_val][column_name]:
 					child = Node()
 					self.children[j_val]=child
-					child_map = {}
+					child_map = {y_val:{}}
 					child_statistics = {y_val:{}}
 					for element in self.statistics[y_val][column_name][j_val]:			
 						for k in self.map[y_val]:
@@ -110,29 +109,47 @@ class Node():
 											child_statistics[y_val][k]={k_val:1}
 										else:
 											child_statistics[y_val][k][k_val]+=1
-					self.children[j_val].set_statistics(self.map.copy(),child_statistics.copy())
+								if k not in child_map[y_val]:
+									child_map[y_val] = {k:self.map[y_val][k].copy()}
+					self.children[j_val].set_statistics(child_map.copy(),child_statistics.copy())
 	
 	##temporary Need to add the real map and statistics
 	def set_statistics(self,map,statistics):
 		"""For adding a map and statistics"""
-		self.map = None
-		self.statistics = None
+		self.map = map
+		self.statistics = statistics
+
 
 	def predict(self, x): ##TO DO in Scikit learn
-		N = x.shape
-		L = len(x[0])-1
-		#Y_prev = zeros((N,L) 
-		gnb = GaussianNB()	
+		N = len(x)
+		
 		if self.activeNode:
-			for i in range(0,L):
-				Y = self.gnb.predict(np.asmatrix(x[i, :]))
+			self.n += 1
+			clf = GaussianNB()
+			Y = zeros((N,self.length_y))
+			clf.fit(x,Y)
+			Y = clf.predict(x)
+			##for i in range(0,L):
+				##Y = gnb.predict(np.asmatrix(x[i, :]))
+			
+			print(Y)
+			print(self.n)
 			return Y
+		else:
+			try:
+				to_transfer = x[0][int(self.splitCondition)]
+				Y= self.children[str(to_transfer)].predict(x)
+				return Y
+			except KeyError:
+				print('value '+to_transfer+' for '+self.splitCondition+' not in the tree')	
+			
 	
 	def update_statistics(self,x,y):
 		"""This method fits the x and y, if the node is active then the statistics are updating according the values of x an y
 		   It is also invoqued the methods for obtaing the first and second best 
 		   if is not an active node, it goes to the child leaves and recursively is called again the method."""
-		self.number_of_classes = len(x[0])-1
+		self.length_y = len(y[0])
+		self.number_of_classes = len(x[0])
 		if self.activeNode:
 			if self.statistics is None:
 				self.statistics = {}
@@ -170,10 +187,16 @@ class Node():
 			self.comparison_entropies_hf_bound()
 		else:
 			to_transfer = x[0][int(self.splitCondition)]
-			x[0][int(self.splitCondition)]
+			e = (zeros(len(x[0]-1)))
+			for i in x[0]:
+				j=0
+				if i != int(self.splitCondition):
+					e[j]=x[0][i]
+					j+=1
+			e=[e]
 			try:
-				self.children[str(to_transfer)].update_statistics(x,y)
+				self.children[str(to_transfer)].update_statistics(e,y)
 			except KeyError:
 				child = Node()
 				self.children[str(to_transfer)]=child
-				self.children[str(to_transfer)].update_statistics(x,y)
+				self.children[str(to_transfer)].update_statistics(e,y)
