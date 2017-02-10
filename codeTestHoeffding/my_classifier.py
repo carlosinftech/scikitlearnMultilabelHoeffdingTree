@@ -9,6 +9,23 @@ from infogainsplitmetric import InfoGainSplitMetric
 from node import Node
 
 
+class MultiLabelCCHoeffdingTreeClassifier:
+
+	def  __init__(self):
+		self.h1 = HoeffdingTreeClassifier()
+	
+	def fit(self, X, Y):
+		self.h1.fit(X,Y)
+		return self
+	
+	def partial_fit(self,x,y=None):
+		self.h1.partial_fit(x,y)
+		return self
+	
+	def predict(self, X):
+		c= self.h1.predict(X)
+		return c
+
 
 class HoeffdingTreeClassifier:
 
