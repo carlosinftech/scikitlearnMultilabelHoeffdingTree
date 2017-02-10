@@ -8,7 +8,9 @@ This implementation is based on Oza and Russell's Online Bagging Models.
 
 **Parameters:**
 n_classifier: Number of different classifiers used for bagging
+
 base_estimator: Base Estimator of the Ensemble Method, such as HoeffdingTree, DecisionTreeClassifier,
+
 buffer_size: Number of streaming instances kept by the buffer as a mini-batch.
 
 **fit(self, x, Y, sample_weight = None):** 
