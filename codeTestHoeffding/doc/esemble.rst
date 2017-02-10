@@ -7,6 +7,7 @@ This class is to create a an ensemble method based on bagging for streaming data
 This implementation is based on Oza and Russell's Online Bagging Models.
 
 **Parameters:**
+
 n_classifier: Number of different classifiers used for bagging
 
 base_estimator: Base Estimator of the Ensemble Method, such as HoeffdingTree, DecisionTreeClassifier,
