@@ -4,8 +4,8 @@ random.seed(0)
 print('Load data')
 import pandas as pd
 
-df = pd.read_csv("data/ohsumed.csv",nrows=1001)#s
-L = 2
+df = pd.read_csv("data/ohsumed.csv",nrows=1500)#s
+L = 3
 N_train = 950
 
 labels = df.columns.values.tolist()[0:L]
@@ -15,11 +15,11 @@ Y = data[:,0:L]
 X = data[:,L:]
 
 print("Experimentation")
-from my_classifier import  MultiLabelCCHoeffdingTreeClassifier
+from multilabel_hoeffding_tree import  MultiLabelHoeffdingTreeClassifier
 from molearn.classifiers.BR import BR
 from sklearn import linear_model
 
-h = [BR(h=linear_model.SGDClassifier(n_iter=1)), MultiLabelCCHoeffdingTreeClassifier()]
+h = [BR(h=linear_model.SGDClassifier(n_iter=1)), MultiLabelHoeffdingTreeClassifier()]
 
 from molearn.core.evaluation import prequential_evaluation, get_errors
 
